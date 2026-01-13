@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Grid, Heading, Text, VStack, HStack, Spinner, Alert, AlertIcon, Select, Input, FormControl, FormLabel, Card, CardBody } from '@chakra-ui/react';
+import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, FormControl, FormLabel, Link as ChakraLink, Divider } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { InlineMarkdown } from '../components/InlineMarkdown';
 import { REGIONS } from '../config/regions';
@@ -34,12 +34,12 @@ export function EditionPage() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minH="100vh" bg="surface.base">
-        <VStack spacing={4}>
+      <Flex justify="center" align="center" minH="100vh" bg="surface.base">
+        <Flex direction="column" align="center" gap={4}>
           <Spinner size="xl" color="text.primary" />
           <Text color="text.primary">Loading edition...</Text>
-        </VStack>
-      </Box>
+        </Flex>
+      </Flex>
     );
   }
 
@@ -54,9 +54,31 @@ export function EditionPage() {
 
   return (
     <Box bg="surface.base" color="text.primary" minH="100vh">
-      {/* Controls */}
-      <Box p={4} borderBottom="1px" borderColor="border.default" bg="surface.overlay">
-        <HStack spacing={4} wrap="wrap" opacity={0.8}>
+      {/* Controls Bar */}
+      <Flex
+        p={4}
+        borderBottom="1px"
+        borderColor="border.default"
+        bg="surface.overlay"
+        align="center"
+        justify="space-between"
+        wrap="wrap"
+        gap={4}
+      >
+        {/* Logo */}
+        <ChakraLink
+          href="/"
+          fontSize="lg"
+          fontWeight="medium"
+          color="text.secondary"
+          _hover={{ color: "text.primary", textDecoration: "none" }}
+          transition="color 0.2s"
+        >
+          bccodex-news
+        </ChakraLink>
+
+        {/* Controls */}
+        <Flex align="center" gap={4} wrap="wrap" opacity={0.8}>
           <FormControl maxW="150px">
             <FormLabel color="text.secondary" fontSize="xs" mb={1}>Region</FormLabel>
             <Select
@@ -87,90 +109,162 @@ export function EditionPage() {
             />
           </FormControl>
           {loading && <Spinner size="sm" color="text.primary" />}
-        </HStack>
-      </Box>
+        </Flex>
+      </Flex>
 
       {/* Error Message */}
       {(error || !edition) && renderErrorMessage()}
 
-      {/* Edition Content - only render when edition exists */}
+      {/* Edition Content - Paper Wrapper */}
       {edition && (
-        <>
-          {/* Masthead */}
-          <Box p={8} borderBottom="1px" borderColor="border.default">
-            <VStack spacing={2} align="stretch">
-              <Heading as="h1" size="3xl" color="text.primary" fontWeight="bold">
+        <Flex justify="center" p={{ base: 4, md: 8 }}>
+          <Box
+            bg="paper.bg"
+            color="paper.ink"
+            maxW="1200px"
+            w="100%"
+            p={{ base: 6, md: 10 }}
+            border="1px"
+            borderColor="paper.rule"
+            boxShadow="paper"
+          >
+            {/* Masthead */}
+            <Flex direction="column" align="center" mb={8} pb={6} borderBottom="2px double" borderColor="paper.rule">
+              <Heading
+                as="h1"
+                fontSize={{ base: "3xl", md: "5xl" }}
+                fontWeight="black"
+                textAlign="center"
+                mb={2}
+                letterSpacing="tight"
+              >
                 {edition.title}
               </Heading>
               {edition.subtitle && (
-                <Heading as="h2" size="md" color="text.secondary" opacity={0.7} fontWeight="normal">
+                <Heading
+                  as="h2"
+                  fontSize={{ base: "sm", md: "md" }}
+                  fontWeight="normal"
+                  color="paper.muted"
+                  textAlign="center"
+                  mb={3}
+                >
                   {edition.subtitle}
                 </Heading>
               )}
-              <HStack spacing={6} mt={2}>
-                <Text color="text.secondary" fontSize="sm">
-                  Region: {regionId}
-                </Text>
-                <Text color="text.secondary" fontSize="sm">
-                  Date: {date}
-                </Text>
-              </HStack>
-            </VStack>
-          </Box>
+              <Flex gap={6} fontSize="xs" color="paper.muted" textTransform="uppercase" letterSpacing="wide">
+                <Text>Region {regionId}</Text>
+                <Text>•</Text>
+                <Text>{date}</Text>
+              </Flex>
+            </Flex>
 
-          {/* Body */}
-          <Box p={8}>
-            <Grid templateColumns={{ base: '1fr', lg: '2fr 1fr' }} gap={8}>
+            {/* Body - Two Column Layout */}
+            <Grid
+              templateColumns={{ base: '1fr', lg: '2fr 1fr' }}
+              gap={8}
+            >
               {/* Main Story */}
               <Box>
-                <VStack spacing={4} align="stretch">
-                  <Heading as="h2" size="xl" color="text.primary">
+                <Flex direction="column" gap={4}>
+                  <Heading
+                    as="h2"
+                    fontSize={{ base: "2xl", md: "3xl" }}
+                    fontWeight="bold"
+                    lineHeight="tight"
+                  >
                     {edition.main_story.headline}
                   </Heading>
                   {edition.main_story.angle && (
-                    <Text color="text.secondary" fontStyle="italic">
+                    <Text
+                      color="paper.muted"
+                      fontStyle="italic"
+                      fontSize="md"
+                      borderLeft="3px solid"
+                      borderColor="paper.rule"
+                      pl={4}
+                    >
                       {edition.main_story.angle}
                     </Text>
                   )}
-                  <InlineMarkdown text={edition.main_story.body} />
-                </VStack>
+                  <Box
+                    fontSize="md"
+                    lineHeight="1.6"
+                    sx={{
+                      // CSS columns for desktop
+                      '@media (min-width: 768px)': {
+                        columnCount: 2,
+                        columnGap: '2rem',
+                        columnRule: '1px solid',
+                        columnRuleColor: 'paper.rule',
+                      },
+                      // Drop cap on first letter
+                      '& > div::first-letter': {
+                        float: 'left',
+                        fontSize: '3.5em',
+                        lineHeight: '0.9',
+                        fontWeight: 'bold',
+                        marginRight: '0.1em',
+                        marginTop: '0.05em',
+                      },
+                    }}
+                  >
+                    <InlineMarkdown text={edition.main_story.body} />
+                  </Box>
+                </Flex>
               </Box>
 
-              {/* Announcements */}
+              {/* Briefs (Announcements) */}
               <Box>
-                <VStack spacing={4} align="stretch">
-                  <Heading as="h3" size="lg" color="text.primary">
-                    Announcements
-                  </Heading>
-                  <VStack spacing={4} align="stretch">
-                    {edition.announcements.length ? (
-                      edition.announcements.map((announcement, index) => (
-                        <Card key={index} variant="elevated">
-                          <CardBody>
-                            <Heading as="h4" size="md" color="text.primary" mb={2}>
-                              {announcement.title}
-                            </Heading>
-                            <Text color="text.secondary">
-                              {announcement.summary}
-                            </Text>
-                          </CardBody>
-                        </Card>
-                      ))
-                    ) : (
-                      <Card variant="elevated">
-                        <CardBody>
-                          <Text color="text.secondary">
-                            No announcements available.
+                <Heading
+                  as="h3"
+                  fontSize="lg"
+                  fontWeight="bold"
+                  textTransform="uppercase"
+                  letterSpacing="wide"
+                  mb={4}
+                  pb={2}
+                  borderBottom="1px solid"
+                  borderColor="paper.rule"
+                >
+                  Announcements
+                </Heading>
+                <Flex direction="column" gap={0}>
+                  {edition.announcements.length ? (
+                    edition.announcements.map((announcement, index) => (
+                      <Box key={index}>
+                        <Box py={3}>
+                          <Heading
+                            as="h4"
+                            fontSize="md"
+                            fontWeight="bold"
+                            mb={2}
+                          >
+                            {announcement.title}
+                          </Heading>
+                          <Text
+                            fontSize="sm"
+                            color="paper.ink"
+                            lineHeight="1.5"
+                          >
+                            {announcement.summary}
                           </Text>
-                        </CardBody>
-                      </Card>
-                    )}
-                  </VStack>
-                </VStack>
+                        </Box>
+                        {index < edition.announcements.length - 1 && (
+                          <Divider borderColor="paper.rule" />
+                        )}
+                      </Box>
+                    ))
+                  ) : (
+                    <Text fontSize="sm" color="paper.muted" fontStyle="italic">
+                      No announcements available.
+                    </Text>
+                  )}
+                </Flex>
               </Box>
             </Grid>
           </Box>
-        </>
+        </Flex>
       )}
     </Box>
   );

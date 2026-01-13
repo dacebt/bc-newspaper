@@ -12,7 +12,17 @@ const config: ThemeConfig = {
 
 export const theme = extendTheme({
   config,
-  colors: palette,
+  colors: {
+    ...palette,
+    // Newspaper content tokens (scoped to paper wrapper)
+    paper: {
+      bg: "#f5f5f0",        // Off-white, warm gray paper
+      ink: "#1a1a1a",       // Near-black ink
+      muted: "#666666",     // Muted text for metadata
+      rule: "#d4d4d4",      // Hairline rules/borders
+      accent: "#4a4a4a",    // Subtle accent (optional)
+    },
+  },
   components,
   ...typography,
   space: spacing,
@@ -29,6 +39,7 @@ export const theme = extendTheme({
   shadows: {
     menu: "0 8px 24px rgba(0, 0, 0, 0.5)", // Menu shadow - defined in palette.shadow.menu
     playerIcon: "0 0 12px rgba(34, 197, 94, 0.5)", // Player icon glow - defined in palette.shadow.playerIcon
+    paper: "0 2px 8px rgba(0, 0, 0, 0.12)", // Subtle paper shadow
   },
   zIndices: {
     base: 0,
