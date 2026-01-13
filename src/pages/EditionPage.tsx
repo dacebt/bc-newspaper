@@ -6,7 +6,11 @@ import { PaperWrapper, PaperTextureLayer, PaperContent } from '../components/Pap
 import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
 
-const DEFAULT_DATE = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+const MIN_DATE = '2026-01-13'; // Deployment date - no editions before this
+const DEFAULT_DATE = (() => {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  return today < MIN_DATE ? MIN_DATE : today;
+})();
 
 // Helper to validate region ID
 function isValidRegionId(id: string): boolean {
@@ -175,6 +179,7 @@ export function EditionPage() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              min={MIN_DATE}
               bg="surface.base"
               borderColor="border.default"
               color="text.primary"
