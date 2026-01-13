@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, Link as ChakraLink, Divider } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { InlineMarkdown } from '../components/InlineMarkdown';
+import { PaperWrapper, PaperTextureLayer, PaperContent } from '../components/PaperSurface';
 import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
 
@@ -21,15 +22,17 @@ function isValidDate(dateStr: string): boolean {
 }
 
 // Read query params from URL
-function readQueryParams(): { regionId: string; date: string } {
+function readQueryParams(): { regionId: string; date: string; textureDebug: boolean } {
   const params = new URLSearchParams(window.location.search);
   const regionParam = params.get('region');
   const dateParam = params.get('date');
+  const textureParam = params.get('texture');
 
   const regionId = regionParam && isValidRegionId(regionParam) ? regionParam : REGIONS[0].id;
   const date = dateParam && isValidDate(dateParam) ? dateParam : DEFAULT_DATE;
+  const textureDebug = textureParam === 'debug';
 
-  return { regionId, date };
+  return { regionId, date, textureDebug };
 }
 
 // Update URL query params
@@ -45,9 +48,37 @@ function updateQueryParams(regionId: string, date: string, replace = false) {
   }
 }
 
+// Helper to format date for masthead
+function formatMastheadDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+  const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+  const dayName = days[date.getDay()];
+  const monthName = months[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+  return `${dayName}, ${monthName} ${day}, ${year}`;
+}
+
+// Helper to compute volume and issue numbers from date
+function computeVolumeAndIssue(dateStr: string): { volume: number; issue: number } {
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const startOfYear = new Date(year, 0, 1);
+  const diffTime = date.getTime() - startOfYear.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Volume = year - 2020 (or similar base year), Issue = day of year
+  const volume = year - 2020;
+  const issue = diffDays;
+  
+  return { volume: Math.max(1, volume), issue };
+}
+
 export function EditionPage() {
   const [regionId, setRegionId] = useState(() => readQueryParams().regionId);
   const [date, setDate] = useState(() => readQueryParams().date);
+  const [textureDebug, setTextureDebug] = useState(() => readQueryParams().textureDebug);
   const [edition, setEdition] = useState<EditionOutput | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,9 +104,10 @@ export function EditionPage() {
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
-      const { regionId: urlRegion, date: urlDate } = readQueryParams();
+      const { regionId: urlRegion, date: urlDate, textureDebug: urlTextureDebug } = readQueryParams();
       setRegionId(urlRegion);
       setDate(urlDate);
+      setTextureDebug(urlTextureDebug);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -188,46 +220,69 @@ export function EditionPage() {
       {(error || !edition) && renderErrorMessage()}
 
       {/* Edition Content - Paper Wrapper */}
-      {edition && (
-        <Flex justify="center" p={{ base: 4, md: 8 }}>
-          <Box
-            bg="paper.bg"
-            color="paper.ink"
-            maxW="1200px"
-            w="100%"
-            p={{ base: 6, md: 10 }}
-            border="1px"
-            borderColor="paper.rule"
-            boxShadow="paper"
-          >
-            {/* Masthead - Newspaper Style */}
-            <Flex direction="column" align="center" mb={8} pb={6} borderBottom="2px double" borderColor="paper.rule">
-              <Heading
-                as="h1"
-                fontSize={{ base: "3xl", md: "5xl" }}
-                fontWeight="black"
-                textAlign="center"
-                mb={2}
-                letterSpacing="tight"
-              >
-                {edition.title}
-              </Heading>
-              {edition.subtitle && (
-                <Heading
-                  as="h2"
-                  fontSize={{ base: "sm", md: "md" }}
-                  fontWeight="normal"
-                  color="paper.muted"
-                  textAlign="center"
-                  mb={3}
-                >
-                  {edition.subtitle}
-                </Heading>
-              )}
-              <Text fontSize="xs" color="paper.muted" textTransform="uppercase" letterSpacing="wide">
-                Region {regionId} • {date}
-              </Text>
-            </Flex>
+      {edition && (() => {
+        const { volume, issue } = computeVolumeAndIssue(date);
+        const mastheadDate = formatMastheadDate(date);
+        
+        return (
+          <Flex justify="center" p={{ base: 4, md: 8 }}>
+            <PaperWrapper>
+              <PaperTextureLayer debugMode={textureDebug} />
+              <PaperContent>
+                {/* Masthead - Classic Newspaper Nameplate */}
+                <Box mb={6}>
+                  {/* Nameplate - Large serif title matching reference */}
+                  <Heading
+                    as="h1"
+                    fontSize={{ base: "5xl", md: "7xl" }}
+                    fontWeight="black"
+                    textAlign="center"
+                    letterSpacing="tighter"
+                    fontFamily={`"Times New Roman", Times, "Georgia", "Palatino", "Book Antiqua", serif`}
+                    mb={3}
+                    lineHeight="1"
+                  >
+                    {edition.title}
+                  </Heading>
+                  
+                  {/* Rule System: Thick then thin (classic newspaper style) */}
+                  <Box
+                    borderTop="4px solid"
+                    borderColor="paper.rule"
+                    mb={1}
+                  />
+                  <Box
+                    borderTop="1px solid"
+                    borderColor="paper.rule"
+                    mb={4}
+                  />
+                  
+                  {/* Dateline Strip - Classic newspaper format */}
+                  <Grid
+                    templateColumns="1fr 2fr 1fr"
+                    gap={3}
+                    color="paper.muted"
+                    textTransform="uppercase"
+                    letterSpacing="widest"
+                    fontWeight="bold"
+                    fontFamily={`"Times New Roman", Times, serif`}
+                  >
+                    {/* Left: Volume/Issue */}
+                    <Text textAlign="left" fontSize="xs">
+                      VOL. {volume} · NO. {issue}
+                    </Text>
+                    
+                    {/* Center: Date and Region */}
+                    <Text textAlign="center" fontSize="xs">
+                      {mastheadDate} · REGION {regionId}
+                    </Text>
+                    
+                    {/* Right: Edition placeholder */}
+                    <Text textAlign="right" fontSize="xs">
+                      EDITION
+                    </Text>
+                  </Grid>
+                </Box>
 
             {/* Body - Two Column Layout */}
             <Grid
@@ -333,9 +388,11 @@ export function EditionPage() {
                 </Flex>
               </Box>
             </Grid>
-          </Box>
-        </Flex>
-      )}
+              </PaperContent>
+            </PaperWrapper>
+          </Flex>
+        );
+      })()}
     </Box>
   );
 }
