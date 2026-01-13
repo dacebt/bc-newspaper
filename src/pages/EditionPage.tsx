@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, FormControl, FormLabel, Link as ChakraLink, Divider } from '@chakra-ui/react';
+import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, Link as ChakraLink, Divider } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { InlineMarkdown } from '../components/InlineMarkdown';
 import { REGIONS } from '../config/regions';
@@ -54,7 +54,7 @@ export function EditionPage() {
 
   return (
     <Box bg="surface.base" color="text.primary" minH="100vh">
-      {/* Controls Bar */}
+      {/* Controls Bar - Single Horizontal Row */}
       <Flex
         p={4}
         borderBottom="1px"
@@ -77,10 +77,10 @@ export function EditionPage() {
           bccodex-news
         </ChakraLink>
 
-        {/* Controls */}
-        <Flex align="center" gap={4} wrap="wrap" opacity={0.8}>
-          <FormControl maxW="150px">
-            <FormLabel color="text.secondary" fontSize="xs" mb={1}>Region</FormLabel>
+        {/* Controls - Inline */}
+        <Flex align="center" gap={3} wrap="wrap">
+          <Flex align="center" gap={2}>
+            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap">Region:</Text>
             <Select
               size="sm"
               value={regionId}
@@ -88,6 +88,7 @@ export function EditionPage() {
               bg="surface.base"
               borderColor="border.default"
               color="text.primary"
+              maxW="120px"
             >
               {REGIONS.map((region) => (
                 <option key={region.id} value={region.id}>
@@ -95,9 +96,9 @@ export function EditionPage() {
                 </option>
               ))}
             </Select>
-          </FormControl>
-          <FormControl maxW="150px">
-            <FormLabel color="text.secondary" fontSize="xs" mb={1}>Date</FormLabel>
+          </Flex>
+          <Flex align="center" gap={2}>
+            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap">Date:</Text>
             <Input
               size="sm"
               type="date"
@@ -106,8 +107,9 @@ export function EditionPage() {
               bg="surface.base"
               borderColor="border.default"
               color="text.primary"
+              maxW="140px"
             />
-          </FormControl>
+          </Flex>
           {loading && <Spinner size="sm" color="text.primary" />}
         </Flex>
       </Flex>
@@ -128,7 +130,7 @@ export function EditionPage() {
             borderColor="paper.rule"
             boxShadow="paper"
           >
-            {/* Masthead */}
+            {/* Masthead - Newspaper Style */}
             <Flex direction="column" align="center" mb={8} pb={6} borderBottom="2px double" borderColor="paper.rule">
               <Heading
                 as="h1"
