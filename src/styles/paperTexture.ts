@@ -22,37 +22,6 @@ export const TEXTURE_CONSTANTS = {
 } as const;
 
 /**
- * Generates a data URL for an SVG filter texture using feTurbulence
- * @param variant - 'fine' for higher frequency, 'coarse' for lower frequency
- */
-export function getPaperGrainTexture(variant: 'fine' | 'coarse' = 'fine'): string {
-  const baseFrequency = variant === 'fine' ? '0.9' : '0.4';
-  const numOctaves = variant === 'fine' ? '3' : '2';
-  const width = variant === 'fine' ? '128' : '256';
-  const height = variant === 'fine' ? '128' : '256';
-
-  // SVG with feTurbulence filter for grain texture
-  // Use feComponentTransfer to clamp contrast for more realistic grain
-  const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg"><defs><filter id="grain-${variant}" x="0%" y="0%" width="100%" height="100%"><feTurbulence baseFrequency="${baseFrequency}" numOctaves="${numOctaves}" stitchTiles="stitch" type="fractalNoise"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 0.5 1"/></feComponentTransfer></filter></defs><rect width="100%" height="100%" filter="url(#grain-${variant})" opacity="0.5"/></svg>`;
-
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-/**
- * Gets fiber layer gradient
- */
-export function getFiberLayer(): string {
-  return 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.02) 1px, rgba(0, 0, 0, 0.02) 2px)';
-}
-
-/**
- * Gets vignette gradient
- */
-export function getVignetteLayer(): string {
-  return 'radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.03) 100%)';
-}
-
-/**
  * Generates SVG texture with adjustable opacity
  */
 function getPaperGrainTextureWithOpacity(variant: 'fine' | 'coarse' = 'fine', opacity: number = 0.5): string {
