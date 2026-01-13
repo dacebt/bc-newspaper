@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, Link as ChakraLink, Divider } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { InlineMarkdown } from '../components/InlineMarkdown';
@@ -7,12 +7,80 @@ import type { EditionOutput } from '../types/edition';
 
 const DEFAULT_DATE = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
+// Helper to validate region ID
+function isValidRegionId(id: string): boolean {
+  return REGIONS.some((r) => r.id === id);
+}
+
+// Helper to validate date format (YYYY-MM-DD)
+function isValidDate(dateStr: string): boolean {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateStr)) return false;
+  const date = new Date(dateStr);
+  return date instanceof Date && !isNaN(date.getTime());
+}
+
+// Read query params from URL
+function readQueryParams(): { regionId: string; date: string } {
+  const params = new URLSearchParams(window.location.search);
+  const regionParam = params.get('region');
+  const dateParam = params.get('date');
+
+  const regionId = regionParam && isValidRegionId(regionParam) ? regionParam : REGIONS[0].id;
+  const date = dateParam && isValidDate(dateParam) ? dateParam : DEFAULT_DATE;
+
+  return { regionId, date };
+}
+
+// Update URL query params
+function updateQueryParams(regionId: string, date: string, replace = false) {
+  const params = new URLSearchParams();
+  params.set('region', regionId);
+  params.set('date', date);
+  const newUrl = `${window.location.pathname}?${params.toString()}`;
+  if (replace) {
+    window.history.replaceState({}, '', newUrl);
+  } else {
+    window.history.pushState({}, '', newUrl);
+  }
+}
+
 export function EditionPage() {
-  const [regionId, setRegionId] = useState(REGIONS[0].id);
-  const [date, setDate] = useState(DEFAULT_DATE);
+  const [regionId, setRegionId] = useState(() => readQueryParams().regionId);
+  const [date, setDate] = useState(() => readQueryParams().date);
   const [edition, setEdition] = useState<EditionOutput | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isInitialMount = useRef(true);
+
+  // Initialize URL params on mount
+  useEffect(() => {
+    if (isInitialMount.current) {
+      // Ensure URL reflects current state (in case URL was missing params)
+      updateQueryParams(regionId, date, true);
+      isInitialMount.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update URL when region/date changes (but not on initial mount)
+  useEffect(() => {
+    if (!isInitialMount.current) {
+      updateQueryParams(regionId, date, true);
+    }
+  }, [regionId, date]);
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const { regionId: urlRegion, date: urlDate } = readQueryParams();
+      setRegionId(urlRegion);
+      setDate(urlDate);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => {
     const fetchEdition = async () => {
@@ -74,7 +142,7 @@ export function EditionPage() {
           _hover={{ color: "text.primary", textDecoration: "none" }}
           transition="color 0.2s"
         >
-          bccodex-news
+          BC Codex News
         </ChakraLink>
 
         {/* Controls - Inline */}

@@ -6,66 +6,110 @@ interface InlineMarkdownProps {
 }
 
 export function InlineMarkdown({ text }: InlineMarkdownProps) {
-  // Simple inline markdown parser for **bold** and *italic* only
+  // Simple inline markdown parser for **bold**, *italic*, and ***bold italic***
+  // Processes in order: ***bold italic***, then **bold**, then *italic*
   const parseInlineMarkdown = (input: string): ReactNode[] => {
     const parts: ReactNode[] = [];
-    let remaining = input;
+    const remaining = input;
     let key = 0;
 
-    // Handle **bold** first
-    const boldRegex = /\*\*(.*?)\*\*/g;
-    let boldMatch;
-
-    while ((boldMatch = boldRegex.exec(remaining)) !== null) {
-      // Add text before the match
-      if (boldMatch.index > 0) {
-        const beforeText = remaining.substring(0, boldMatch.index);
-        parts.push(beforeText);
-      }
-
-      // Add the bold text
-      const boldText = boldMatch[1];
-      parts.push(
-        <Text key={key++} as="strong" color="text.primary">
-          {boldText}
-        </Text>
-      );
-
-      // Update remaining text
-      remaining = remaining.substring(boldMatch.index + boldMatch[0].length);
-      boldRegex.lastIndex = 0; // Reset regex for next search
+    // Step 1: Handle ***bold italic*** first (must come before **bold** and *italic*)
+    const boldItalicRegex = /\*\*\*(.*?)\*\*\*/g;
+    const boldItalicMatches: Array<{ start: number; end: number; text: string }> = [];
+    let boldItalicMatch: RegExpExecArray | null;
+    
+    while ((boldItalicMatch = boldItalicRegex.exec(remaining)) !== null) {
+      boldItalicMatches.push({
+        start: boldItalicMatch.index,
+        end: boldItalicMatch.index + boldItalicMatch[0].length,
+        text: boldItalicMatch[1],
+      });
     }
 
-    // Add remaining text if any
-    if (remaining) {
-      // Now handle *italic* in the remaining text
-      const italicRegex = /\*(.*?)\*/g;
-      let italicMatch;
+    // Step 2: Handle **bold** (but skip if it's inside a *** match)
+    const boldRegex = /\*\*(.*?)\*\*/g;
+    const boldMatches: Array<{ start: number; end: number; text: string }> = [];
+    let boldMatch: RegExpExecArray | null;
+    
+    while ((boldMatch = boldRegex.exec(remaining)) !== null) {
+      // Skip if this bold match is inside a bold+italic match
+      const isInsideBoldItalic = boldItalicMatches.some(
+        (bi) => boldMatch!.index >= bi.start && boldMatch!.index < bi.end
+      );
+      if (!isInsideBoldItalic) {
+        boldMatches.push({
+          start: boldMatch.index,
+          end: boldMatch.index + boldMatch[0].length,
+          text: boldMatch[1],
+        });
+      }
+    }
 
-      while ((italicMatch = italicRegex.exec(remaining)) !== null) {
-        // Add text before the match
-        if (italicMatch.index > 0) {
-          const beforeText = remaining.substring(0, italicMatch.index);
-          parts.push(beforeText);
-        }
+    // Step 3: Handle *italic* (but skip if it's inside a ** or *** match)
+    const italicRegex = /\*(.*?)\*/g;
+    const italicMatches: Array<{ start: number; end: number; text: string }> = [];
+    let italicMatch: RegExpExecArray | null;
+    
+    while ((italicMatch = italicRegex.exec(remaining)) !== null) {
+      // Skip if this italic match is inside a bold or bold+italic match
+      const isInsideBold = boldMatches.some(
+        (b) => italicMatch!.index >= b.start && italicMatch!.index < b.end
+      );
+      const isInsideBoldItalic = boldItalicMatches.some(
+        (bi) => italicMatch!.index >= bi.start && italicMatch!.index < bi.end
+      );
+      if (!isInsideBold && !isInsideBoldItalic) {
+        italicMatches.push({
+          start: italicMatch.index,
+          end: italicMatch.index + italicMatch[0].length,
+          text: italicMatch[1],
+        });
+      }
+    }
 
-        // Add the italic text
-        const italicText = italicMatch[1];
+    // Combine all matches and sort by position
+    type Match = { start: number; end: number; text: string; type: 'boldItalic' | 'bold' | 'italic' };
+    const allMatches: Match[] = [
+      ...boldItalicMatches.map((m) => ({ ...m, type: 'boldItalic' as const })),
+      ...boldMatches.map((m) => ({ ...m, type: 'bold' as const })),
+      ...italicMatches.map((m) => ({ ...m, type: 'italic' as const })),
+    ].sort((a, b) => a.start - b.start);
+
+    // Build parts array
+    let lastIndex = 0;
+    for (const match of allMatches) {
+      // Add text before this match
+      if (match.start > lastIndex) {
+        parts.push(remaining.substring(lastIndex, match.start));
+      }
+
+      // Add the formatted text
+      if (match.type === 'boldItalic') {
         parts.push(
-          <Text key={key++} as="em" color="text.primary">
-            {italicText}
+          <Text key={key++} as="strong" fontWeight="bold" color="inherit">
+            <Text as="em" fontStyle="italic">{match.text}</Text>
           </Text>
         );
-
-        // Update remaining text
-        remaining = remaining.substring(italicMatch.index + italicMatch[0].length);
-        italicRegex.lastIndex = 0; // Reset regex for next search
+      } else if (match.type === 'bold') {
+        parts.push(
+          <Text key={key++} as="strong" fontWeight="bold" color="inherit">
+            {match.text}
+          </Text>
+        );
+      } else {
+        parts.push(
+          <Text key={key++} as="em" fontStyle="italic" color="inherit">
+            {match.text}
+          </Text>
+        );
       }
 
-      // Add any final remaining text
-      if (remaining) {
-        parts.push(remaining);
-      }
+      lastIndex = match.end;
+    }
+
+    // Add remaining text
+    if (lastIndex < remaining.length) {
+      parts.push(remaining.substring(lastIndex));
     }
 
     return parts;
