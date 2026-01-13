@@ -93,80 +93,85 @@ export function EditionPage() {
       {/* Error Message */}
       {(error || !edition) && renderErrorMessage()}
 
-      {/* Masthead */}
-      <Box p={8} borderBottom="1px" borderColor="border.default">
-        <VStack spacing={2} align="stretch">
-          <Heading as="h1" size="3xl" color="text.primary" fontWeight="bold">
-            {edition?.title || 'BitCraft Regional Newspaper'}
-          </Heading>
-          {edition?.subtitle && (
-            <Heading as="h2" size="md" color="text.secondary" opacity={0.7} fontWeight="normal">
-              {edition.subtitle}
-            </Heading>
-          )}
-          <HStack spacing={6} mt={2}>
-            <Text color="text.secondary" fontSize="sm">
-              Region: {regionId}
-            </Text>
-            <Text color="text.secondary" fontSize="sm">
-              Date: {date}
-            </Text>
-          </HStack>
-        </VStack>
-      </Box>
-
-      {/* Body */}
-      <Box p={8}>
-        <Grid templateColumns={{ base: '1fr', lg: '2fr 1fr' }} gap={8}>
-          {/* Main Story */}
-          <Box>
-            <VStack spacing={4} align="stretch">
-              <Heading as="h2" size="xl" color="text.primary">
-                {edition?.main_story.headline || 'Main Story'}
+      {/* Edition Content - only render when edition exists */}
+      {edition && (
+        <>
+          {/* Masthead */}
+          <Box p={8} borderBottom="1px" borderColor="border.default">
+            <VStack spacing={2} align="stretch">
+              <Heading as="h1" size="3xl" color="text.primary" fontWeight="bold">
+                {edition.title}
               </Heading>
-              {edition?.main_story.angle && (
-                <Text color="text.secondary" fontStyle="italic">
-                  {edition.main_story.angle}
-                </Text>
+              {edition.subtitle && (
+                <Heading as="h2" size="md" color="text.secondary" opacity={0.7} fontWeight="normal">
+                  {edition.subtitle}
+                </Heading>
               )}
-              <InlineMarkdown text={edition?.main_story.body_md || 'No story content available.'} />
+              <HStack spacing={6} mt={2}>
+                <Text color="text.secondary" fontSize="sm">
+                  Region: {regionId}
+                </Text>
+                <Text color="text.secondary" fontSize="sm">
+                  Date: {date}
+                </Text>
+              </HStack>
             </VStack>
           </Box>
 
-          {/* Announcements */}
-          <Box>
-            <VStack spacing={4} align="stretch">
-              <Heading as="h3" size="lg" color="text.primary">
-                Announcements
-              </Heading>
-              <VStack spacing={4} align="stretch">
-                {edition?.announcements.length ? (
-                  edition.announcements.map((announcement, index) => (
-                    <Card key={index} variant="elevated">
-                      <CardBody>
-                        <Heading as="h4" size="md" color="text.primary" mb={2}>
-                          {announcement.title}
-                        </Heading>
-                        <Text color="text.secondary">
-                          {announcement.summary}
-                        </Text>
-                      </CardBody>
-                    </Card>
-                  ))
-                ) : (
-                  <Card variant="elevated">
-                    <CardBody>
-                      <Text color="text.secondary">
-                        No announcements available.
-                      </Text>
-                    </CardBody>
-                  </Card>
-                )}
-              </VStack>
-            </VStack>
+          {/* Body */}
+          <Box p={8}>
+            <Grid templateColumns={{ base: '1fr', lg: '2fr 1fr' }} gap={8}>
+              {/* Main Story */}
+              <Box>
+                <VStack spacing={4} align="stretch">
+                  <Heading as="h2" size="xl" color="text.primary">
+                    {edition.main_story.headline}
+                  </Heading>
+                  {edition.main_story.angle && (
+                    <Text color="text.secondary" fontStyle="italic">
+                      {edition.main_story.angle}
+                    </Text>
+                  )}
+                  <InlineMarkdown text={edition.main_story.body_md} />
+                </VStack>
+              </Box>
+
+              {/* Announcements */}
+              <Box>
+                <VStack spacing={4} align="stretch">
+                  <Heading as="h3" size="lg" color="text.primary">
+                    Announcements
+                  </Heading>
+                  <VStack spacing={4} align="stretch">
+                    {edition.announcements.length ? (
+                      edition.announcements.map((announcement, index) => (
+                        <Card key={index} variant="elevated">
+                          <CardBody>
+                            <Heading as="h4" size="md" color="text.primary" mb={2}>
+                              {announcement.title}
+                            </Heading>
+                            <Text color="text.secondary">
+                              {announcement.summary}
+                            </Text>
+                          </CardBody>
+                        </Card>
+                      ))
+                    ) : (
+                      <Card variant="elevated">
+                        <CardBody>
+                          <Text color="text.secondary">
+                            No announcements available.
+                          </Text>
+                        </CardBody>
+                      </Card>
+                    )}
+                  </VStack>
+                </VStack>
+              </Box>
+            </Grid>
           </Box>
-        </Grid>
-      </Box>
+        </>
+      )}
     </Box>
   );
 }
