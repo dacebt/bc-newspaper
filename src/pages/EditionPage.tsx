@@ -60,21 +60,6 @@ function formatMastheadDate(dateStr: string): string {
   return `${dayName}, ${monthName} ${day}, ${year}`;
 }
 
-// Helper to compute volume and issue numbers from date
-function computeVolumeAndIssue(dateStr: string): { volume: number; issue: number } {
-  const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const startOfYear = new Date(year, 0, 1);
-  const diffTime = date.getTime() - startOfYear.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-  
-  // Volume = year - 2020 (or similar base year), Issue = day of year
-  const volume = year - 2020;
-  const issue = diffDays;
-  
-  return { volume: Math.max(1, volume), issue };
-}
-
 export function EditionPage() {
   const [regionId, setRegionId] = useState(() => readQueryParams().regionId);
   const [date, setDate] = useState(() => readQueryParams().date);
@@ -221,7 +206,6 @@ export function EditionPage() {
 
       {/* Edition Content - Paper Wrapper */}
       {edition && (() => {
-        const { volume, issue } = computeVolumeAndIssue(date);
         const mastheadDate = formatMastheadDate(date);
         
         return (
@@ -259,7 +243,7 @@ export function EditionPage() {
                   
                   {/* Dateline Strip - Classic newspaper format */}
                   <Grid
-                    templateColumns="1fr 2fr 1fr"
+                    templateColumns="1fr 1fr"
                     gap={3}
                     color="paper.muted"
                     textTransform="uppercase"
@@ -267,13 +251,8 @@ export function EditionPage() {
                     fontWeight="bold"
                     fontFamily={`"Times New Roman", Times, serif`}
                   >
-                    {/* Left: Volume/Issue */}
+                    {/* Left: Date and Region */}
                     <Text textAlign="left" fontSize="xs">
-                      VOL. {volume} · NO. {issue}
-                    </Text>
-                    
-                    {/* Center: Date and Region */}
-                    <Text textAlign="center" fontSize="xs">
                       {mastheadDate} · REGION {regionId}
                     </Text>
                     
