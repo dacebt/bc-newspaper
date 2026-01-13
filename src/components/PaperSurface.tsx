@@ -30,8 +30,8 @@ export function PaperWrapper({ children, ...props }: PaperWrapperProps) {
 /**
  * PaperTextureLayer - Absolute overlay with texture effects
  */
-export function PaperTextureLayer({ debugMode = false }: { debugMode?: boolean }) {
-  const textureStyles = getTextureLayers(debugMode);
+export function PaperTextureLayer() {
+  const textureStyles = getTextureLayers();
 
   return (
     <Box

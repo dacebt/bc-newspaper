@@ -10,8 +10,6 @@ export const TEXTURE_CONSTANTS = {
   FINE_GRAIN_OPACITY: 0.15, // Main grain texture - more visible
   COARSE_GRAIN_OPACITY: 0.08, // Secondary grain for depth
   VIGNETTE_OPACITY: 0.01, // Minimal vignette (reference shows no noticeable vignette)
-  // Debug mode boost
-  DEBUG_OPACITY_BOOST: 0.2,
   // Background sizes - fine grain should be more prominent
   FINE_GRAIN_SIZE: '200px 200px', // Slightly smaller for finer detail
   COARSE_GRAIN_SIZE: '400px 400px', // Larger blotches
@@ -40,29 +38,26 @@ function getPaperGrainTextureWithOpacity(variant: 'fine' | 'coarse' = 'fine', op
 
 /**
  * Builds complete background image array for texture layers
- * @param debugMode - if true, increases opacities for visibility
  */
-export function getTextureLayers(debugMode: boolean = false): {
+export function getTextureLayers(): {
   backgroundImage: string[];
   backgroundSize: string[];
   backgroundRepeat: string[];
   opacity: number;
   mixBlendMode: string;
 } {
-  const opacityBoost = debugMode ? TEXTURE_CONSTANTS.DEBUG_OPACITY_BOOST : 0;
-  
   // Build layers in order: fiber, fine grain, coarse grain, vignette
-  const fiberOpacity = Math.min(1, TEXTURE_CONSTANTS.FIBER_OPACITY + opacityBoost);
-  const fineGrainOpacity = Math.min(1, TEXTURE_CONSTANTS.FINE_GRAIN_OPACITY + opacityBoost);
-  const coarseGrainOpacity = Math.min(1, TEXTURE_CONSTANTS.COARSE_GRAIN_OPACITY + opacityBoost);
-  const vignetteOpacity = Math.min(1, TEXTURE_CONSTANTS.VIGNETTE_OPACITY + opacityBoost);
+  const fiberOpacity = TEXTURE_CONSTANTS.FIBER_OPACITY;
+  const fineGrainOpacity = TEXTURE_CONSTANTS.FINE_GRAIN_OPACITY;
+  const coarseGrainOpacity = TEXTURE_CONSTANTS.COARSE_GRAIN_OPACITY;
+  const vignetteOpacity = TEXTURE_CONSTANTS.VIGNETTE_OPACITY;
 
   // Create opacity-adjusted gradients
   const fiberLayer = `repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, ${fiberOpacity}) 1px, rgba(0, 0, 0, ${fiberOpacity}) 2px)`;
   const vignetteLayer = `radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, ${vignetteOpacity}) 100%)`;
 
   // Overall layer opacity - visible grain texture (reference shows clearly visible uniform grain)
-  const overallOpacity = debugMode ? 0.5 : 0.28;
+  const overallOpacity = 0.28;
 
   // Reference shows uniform granular texture with no distinct fiber patterns or vignette
   // Focus on grain layers, minimize fiber/vignette

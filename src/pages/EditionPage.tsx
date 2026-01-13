@@ -14,15 +14,13 @@ function isValidRegionId(id: string): boolean {
 }
 
 // Read query params from URL
-function readQueryParams(): { regionId: string; textureDebug: boolean } {
+function readQueryParams(): { regionId: string } {
   const params = new URLSearchParams(window.location.search);
   const regionParam = params.get('region');
-  const textureParam = params.get('texture');
 
   const regionId = regionParam && isValidRegionId(regionParam) ? regionParam : REGIONS[0].id;
-  const textureDebug = textureParam === 'debug';
 
-  return { regionId, textureDebug };
+  return { regionId };
 }
 
 // Update URL query params
@@ -52,7 +50,6 @@ function formatMastheadDate(dateStr: string): string {
 export function EditionPage() {
   const [regionId, setRegionId] = useState(() => readQueryParams().regionId);
   const [date, setDate] = useState(DEFAULT_DATE);
-  const [textureDebug, setTextureDebug] = useState(() => readQueryParams().textureDebug);
   const [edition, setEdition] = useState<EditionOutput | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,9 +75,8 @@ export function EditionPage() {
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
-      const { regionId: urlRegion, textureDebug: urlTextureDebug } = readQueryParams();
+      const { regionId: urlRegion } = readQueryParams();
       setRegionId(urlRegion);
-      setTextureDebug(urlTextureDebug);
       // Date is not synced from URL - always stays as user set it
     };
 
@@ -200,7 +196,7 @@ export function EditionPage() {
         return (
           <Flex justify="center" p={{ base: 4, md: 8 }}>
             <PaperWrapper>
-              <PaperTextureLayer debugMode={textureDebug} />
+              <PaperTextureLayer />
               <PaperContent>
                 {/* Masthead - Classic Newspaper Nameplate */}
                 <Box mb={6}>
