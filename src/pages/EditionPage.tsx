@@ -78,9 +78,9 @@ export function EditionPage() {
         </ChakraLink>
 
         {/* Controls - Inline */}
-        <Flex align="center" gap={3} wrap="wrap">
+        <Flex align="center" gap={3} wrap={{ base: "wrap", sm: "nowrap" }} minW="0">
           <Flex align="center" gap={2}>
-            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap">Region:</Text>
+            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap" id="region-label">Region:</Text>
             <Select
               size="sm"
               value={regionId}
@@ -89,6 +89,7 @@ export function EditionPage() {
               borderColor="border.default"
               color="text.primary"
               maxW="120px"
+              aria-labelledby="region-label"
             >
               {REGIONS.map((region) => (
                 <option key={region.id} value={region.id}>
@@ -98,7 +99,7 @@ export function EditionPage() {
             </Select>
           </Flex>
           <Flex align="center" gap={2}>
-            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap">Date:</Text>
+            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap" id="date-label">Date:</Text>
             <Input
               size="sm"
               type="date"
@@ -108,6 +109,7 @@ export function EditionPage() {
               borderColor="border.default"
               color="text.primary"
               maxW="140px"
+              aria-labelledby="date-label"
             />
           </Flex>
           {loading && <Spinner size="sm" color="text.primary" />}
@@ -154,11 +156,9 @@ export function EditionPage() {
                   {edition.subtitle}
                 </Heading>
               )}
-              <Flex gap={6} fontSize="xs" color="paper.muted" textTransform="uppercase" letterSpacing="wide">
-                <Text>Region {regionId}</Text>
-                <Text>•</Text>
-                <Text>{date}</Text>
-              </Flex>
+              <Text fontSize="xs" color="paper.muted" textTransform="uppercase" letterSpacing="wide">
+                Region {regionId} • {date}
+              </Text>
             </Flex>
 
             {/* Body - Two Column Layout */}
