@@ -13,33 +13,22 @@ function isValidRegionId(id: string): boolean {
   return REGIONS.some((r) => r.id === id);
 }
 
-// Helper to validate date format (YYYY-MM-DD)
-function isValidDate(dateStr: string): boolean {
-  const regex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!regex.test(dateStr)) return false;
-  const date = new Date(dateStr);
-  return date instanceof Date && !isNaN(date.getTime());
-}
-
 // Read query params from URL
-function readQueryParams(): { regionId: string; date: string; textureDebug: boolean } {
+function readQueryParams(): { regionId: string; textureDebug: boolean } {
   const params = new URLSearchParams(window.location.search);
   const regionParam = params.get('region');
-  const dateParam = params.get('date');
   const textureParam = params.get('texture');
 
   const regionId = regionParam && isValidRegionId(regionParam) ? regionParam : REGIONS[0].id;
-  const date = dateParam && isValidDate(dateParam) ? dateParam : DEFAULT_DATE;
   const textureDebug = textureParam === 'debug';
 
-  return { regionId, date, textureDebug };
+  return { regionId, textureDebug };
 }
 
 // Update URL query params
-function updateQueryParams(regionId: string, date: string, replace = false) {
+function updateQueryParams(regionId: string, replace = false) {
   const params = new URLSearchParams();
   params.set('region', regionId);
-  params.set('date', date);
   const newUrl = `${window.location.pathname}?${params.toString()}`;
   if (replace) {
     window.history.replaceState({}, '', newUrl);
@@ -62,7 +51,7 @@ function formatMastheadDate(dateStr: string): string {
 
 export function EditionPage() {
   const [regionId, setRegionId] = useState(() => readQueryParams().regionId);
-  const [date, setDate] = useState(() => readQueryParams().date);
+  const [date, setDate] = useState(DEFAULT_DATE);
   const [textureDebug, setTextureDebug] = useState(() => readQueryParams().textureDebug);
   const [edition, setEdition] = useState<EditionOutput | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,26 +62,26 @@ export function EditionPage() {
   useEffect(() => {
     if (isInitialMount.current) {
       // Ensure URL reflects current state (in case URL was missing params)
-      updateQueryParams(regionId, date, true);
+      updateQueryParams(regionId, true);
       isInitialMount.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update URL when region/date changes (but not on initial mount)
+  // Update URL when region changes (but not on initial mount)
   useEffect(() => {
     if (!isInitialMount.current) {
-      updateQueryParams(regionId, date, true);
+      updateQueryParams(regionId, true);
     }
-  }, [regionId, date]);
+  }, [regionId]);
 
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
-      const { regionId: urlRegion, date: urlDate, textureDebug: urlTextureDebug } = readQueryParams();
+      const { regionId: urlRegion, textureDebug: urlTextureDebug } = readQueryParams();
       setRegionId(urlRegion);
-      setDate(urlDate);
       setTextureDebug(urlTextureDebug);
+      // Date is not synced from URL - always stays as user set it
     };
 
     window.addEventListener('popstate', handlePopState);
