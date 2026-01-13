@@ -132,7 +132,7 @@ export function EditionPage() {
                       {edition.main_story.angle}
                     </Text>
                   )}
-                  <InlineMarkdown text={edition.main_story.body_md} />
+                  <InlineMarkdown text={edition.main_story.body} />
                 </VStack>
               </Box>
 

@@ -6,7 +6,7 @@ export interface Announcement {
 export interface MainStory {
   headline: string;
   angle?: string;
-  body_md: string;
+  body: string;
 }
 
 export interface EditionOutput {
