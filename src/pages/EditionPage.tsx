@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Grid, Heading, Text, VStack, HStack, Spinner, Alert, AlertIcon, Select, Input, FormControl, FormLabel } from '@chakra-ui/react';
+import { Box, Grid, Heading, Text, VStack, HStack, Spinner, Alert, AlertIcon, Select, Input, FormControl, FormLabel, Card, CardBody } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { InlineMarkdown } from '../components/InlineMarkdown';
 import type { EditionOutput } from '../types/edition';
@@ -60,14 +60,15 @@ export function EditionPage() {
   return (
     <Box bg="surface.base" color="text.primary" minH="100vh">
       {/* Controls */}
-      <Box p={4} borderBottom="1px" borderColor="border.default">
-        <HStack spacing={4} wrap="wrap">
-          <FormControl maxW="200px">
-            <FormLabel color="text.secondary" fontSize="sm">Region</FormLabel>
+      <Box p={4} borderBottom="1px" borderColor="border.default" bg="surface.overlay">
+        <HStack spacing={4} wrap="wrap" opacity={0.8}>
+          <FormControl maxW="150px">
+            <FormLabel color="text.secondary" fontSize="xs" mb={1}>Region</FormLabel>
             <Select
+              size="sm"
               value={regionId}
               onChange={(e) => setRegionId(e.target.value)}
-              bg="surface.overlay"
+              bg="surface.base"
               borderColor="border.default"
               color="text.primary"
             >
@@ -75,13 +76,14 @@ export function EditionPage() {
               <option value="2">Region 2</option>
             </Select>
           </FormControl>
-          <FormControl maxW="200px">
-            <FormLabel color="text.secondary" fontSize="sm">Date</FormLabel>
+          <FormControl maxW="150px">
+            <FormLabel color="text.secondary" fontSize="xs" mb={1}>Date</FormLabel>
             <Input
+              size="sm"
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              bg="surface.overlay"
+              bg="surface.base"
               borderColor="border.default"
               color="text.primary"
             />
@@ -95,20 +97,20 @@ export function EditionPage() {
 
       {/* Masthead */}
       <Box p={8} borderBottom="1px" borderColor="border.default">
-        <VStack spacing={4} align="stretch">
-          <Heading as="h1" size="2xl" color="text.primary">
+        <VStack spacing={2} align="stretch">
+          <Heading as="h1" size="3xl" color="text.primary" fontWeight="bold">
             {edition?.title || 'BitCraft Regional Newspaper'}
           </Heading>
           {edition?.subtitle && (
-            <Heading as="h2" size="lg" color="text.secondary">
+            <Heading as="h2" size="md" color="text.secondary" opacity={0.7} fontWeight="normal">
               {edition.subtitle}
             </Heading>
           )}
-          <HStack spacing={4}>
-            <Text color="text.secondary">
+          <HStack spacing={6} mt={2}>
+            <Text color="text.secondary" fontSize="sm">
               Region: {regionId}
             </Text>
-            <Text color="text.secondary">
+            <Text color="text.secondary" fontSize="sm">
               Date: {date}
             </Text>
           </HStack>
@@ -142,34 +144,25 @@ export function EditionPage() {
               <VStack spacing={4} align="stretch">
                 {edition?.announcements.length ? (
                   edition.announcements.map((announcement, index) => (
-                    <Box
-                      key={index}
-                      p={4}
-                      bg="surface.overlay"
-                      borderRadius="md"
-                      border="1px"
-                      borderColor="border.default"
-                    >
-                      <Heading as="h4" size="md" color="text.primary" mb={2}>
-                        {announcement.title}
-                      </Heading>
-                      <Text color="text.secondary">
-                        {announcement.summary}
-                      </Text>
-                    </Box>
+                    <Card key={index} variant="elevated">
+                      <CardBody>
+                        <Heading as="h4" size="md" color="text.primary" mb={2}>
+                          {announcement.title}
+                        </Heading>
+                        <Text color="text.secondary">
+                          {announcement.summary}
+                        </Text>
+                      </CardBody>
+                    </Card>
                   ))
                 ) : (
-                  <Box
-                    p={4}
-                    bg="surface.overlay"
-                    borderRadius="md"
-                    border="1px"
-                    borderColor="border.default"
-                  >
-                    <Text color="text.secondary">
-                      No announcements available.
-                    </Text>
-                  </Box>
+                  <Card variant="elevated">
+                    <CardBody>
+                      <Text color="text.secondary">
+                        No announcements available.
+                      </Text>
+                    </CardBody>
+                  </Card>
                 )}
               </VStack>
             </VStack>
