@@ -52,10 +52,6 @@ export function EditionPage() {
     </Box>
   );
 
-  if (!edition) {
-    return null;
-  }
-
   return (
     <Box bg="surface.base" color="text.primary" minH="100vh">
       {/* Controls */}
@@ -95,7 +91,7 @@ export function EditionPage() {
       </Box>
 
       {/* Error Message */}
-      {error && renderErrorMessage()}
+      {(error || !edition) && renderErrorMessage()}
 
       {/* Masthead */}
       <Box p={8} borderBottom="1px" borderColor="border.default">
