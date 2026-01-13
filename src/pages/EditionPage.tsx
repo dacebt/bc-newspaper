@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react';
 import { Box, Grid, Heading, Text, VStack, HStack, Spinner, Alert, AlertIcon, Select, Input, FormControl, FormLabel, Card, CardBody } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { InlineMarkdown } from '../components/InlineMarkdown';
+import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
 
-// Hardcoded defaults - can be made configurable later
-const DEFAULT_REGION_ID = '1';
 const DEFAULT_DATE = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
 export function EditionPage() {
-  const [regionId, setRegionId] = useState(DEFAULT_REGION_ID);
+  const [regionId, setRegionId] = useState(REGIONS[0].id);
   const [date, setDate] = useState(DEFAULT_DATE);
   const [edition, setEdition] = useState<EditionOutput | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,8 +71,11 @@ export function EditionPage() {
               borderColor="border.default"
               color="text.primary"
             >
-              <option value="1">Region 1</option>
-              <option value="2">Region 2</option>
+              {REGIONS.map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.label}
+                </option>
+              ))}
             </Select>
           </FormControl>
           <FormControl maxW="150px">

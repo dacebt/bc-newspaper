@@ -14,7 +14,7 @@ A React-based frontend for displaying BitCraft regional newspaper editions.
   - Only used when running `npm run dev`; not used in production builds
   - If set, proxies `/api` requests to this target during development
 
-Copy `env` to `.env` and configure as needed.
+Copy `.env.example` to `.env` and configure as needed.
 
 ## Development
 
