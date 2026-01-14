@@ -8,7 +8,12 @@ import type { EditionOutput } from '../types/edition';
 
 const MIN_DATE = '2026-01-13'; // Deployment date - no editions before this
 const DEFAULT_DATE = (() => {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  // Get today's date in local timezone (not UTC)
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`; // YYYY-MM-DD format
   return today < MIN_DATE ? MIN_DATE : today;
 })();
 
