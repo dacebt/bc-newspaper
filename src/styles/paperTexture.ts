@@ -6,10 +6,10 @@
 // Centralized texture constants
 export const TEXTURE_CONSTANTS = {
   // Opacities - tuned for visible but subtle grain
-  FIBER_OPACITY: 0.01, // Minimal fiber (reference shows no distinct fiber patterns)
-  FINE_GRAIN_OPACITY: 0.15, // Main grain texture - more visible
-  COARSE_GRAIN_OPACITY: 0.08, // Secondary grain for depth
-  VIGNETTE_OPACITY: 0.01, // Minimal vignette (reference shows no noticeable vignette)
+  FIBER_OPACITY: 0.08, // Minimal fiber (reference shows no distinct fiber patterns)
+  FINE_GRAIN_OPACITY: 0.35, // Main grain texture - more visible
+  COARSE_GRAIN_OPACITY: 0.18, // Secondary grain for depth
+  VIGNETTE_OPACITY: 0.05, // Minimal vignette (reference shows no noticeable vignette)
   // Background sizes - fine grain should be more prominent
   FINE_GRAIN_SIZE: '200px 200px', // Slightly smaller for finer detail
   COARSE_GRAIN_SIZE: '400px 400px', // Larger blotches
@@ -56,8 +56,12 @@ export function getTextureLayers(): {
   const fiberLayer = `repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, ${fiberOpacity}) 1px, rgba(0, 0, 0, ${fiberOpacity}) 2px)`;
   const vignetteLayer = `radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, ${vignetteOpacity}) 100%)`;
 
+  // Create halftone dot pattern
+  const halftoneSvg = `<svg width="4" height="4" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="0.8" fill="black" opacity="0.12"/></svg>`;
+  const halftonePattern = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(halftoneSvg)}`;
+
   // Overall layer opacity - visible grain texture (reference shows clearly visible uniform grain)
-  const overallOpacity = 0.28;
+  const overallOpacity = 0.45;
 
   // Reference shows uniform granular texture with no distinct fiber patterns or vignette
   // Focus on grain layers, minimize fiber/vignette
@@ -67,6 +71,8 @@ export function getTextureLayers(): {
       getPaperGrainTextureWithOpacity('fine', fineGrainOpacity),
       // Coarse grain adds subtle depth
       getPaperGrainTextureWithOpacity('coarse', coarseGrainOpacity),
+      // Halftone dot pattern for vintage newspaper aesthetic
+      halftonePattern,
       // Minimal fiber (barely visible)
       fiberLayer,
       // Minimal vignette (barely visible)
@@ -75,10 +81,11 @@ export function getTextureLayers(): {
     backgroundSize: [
       TEXTURE_CONSTANTS.FINE_GRAIN_SIZE,
       TEXTURE_CONSTANTS.COARSE_GRAIN_SIZE,
+      '4px 4px',
       TEXTURE_CONSTANTS.FIBER_SIZE,
       '100% 100%',
     ],
-    backgroundRepeat: ['repeat', 'repeat', 'repeat', 'no-repeat'],
+    backgroundRepeat: ['repeat', 'repeat', 'repeat', 'repeat', 'no-repeat'],
     opacity: overallOpacity,
     mixBlendMode: TEXTURE_CONSTANTS.BLEND_MODE,
   };

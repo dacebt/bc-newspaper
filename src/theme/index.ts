@@ -16,7 +16,7 @@ export const theme = extendTheme({
     ...palette,
     // Newspaper content tokens (scoped to paper wrapper)
     paper: {
-      bg: "#f5f5f0",        // Off-white, warm gray paper
+      bg: "#f0ede5",        // Off-white, warm gray paper
       ink: "#1a1a1a",       // Near-black ink
       muted: "#666666",     // Muted text for metadata
       rule: "#d4d4d4",      // Hairline rules/borders
