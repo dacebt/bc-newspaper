@@ -334,14 +334,14 @@ export function EditionPage() {
                             fontWeight="bold"
                             mb={2}
                           >
-                            {announcement.title}
+                            <InlineMarkdown text={announcement.title} />
                           </Heading>
                           <Text
                             fontSize="sm"
                             color="paper.ink"
                             lineHeight="1.5"
                           >
-                            {announcement.summary}
+                            <InlineMarkdown text={announcement.summary} />
                           </Text>
                         </Box>
                         {index < edition.announcements.length - 1 && (
