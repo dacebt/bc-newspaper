@@ -122,14 +122,57 @@ export function EditionPage() {
     );
   }
 
-  const renderErrorMessage = () => (
-    <Box p={4}>
-      <Alert status="error" borderRadius="md" mb={4}>
-        <AlertIcon />
-        No published edition for this region/date.
-      </Alert>
-    </Box>
-  );
+  const isWaitingForTodaysEdition = () => {
+    // Check if requested date is today in local timezone
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    if (date !== todayString) {
+      return false;
+    }
+    
+    // Check if current UTC time is before 10:30 AM UTC
+    const nowUTC = new Date();
+    const utcHours = nowUTC.getUTCHours();
+    const utcMinutes = nowUTC.getUTCMinutes();
+    const currentUTCMinutes = utcHours * 60 + utcMinutes;
+    const generationWindowEnd = 10 * 60 + 30; // 10:30 AM UTC in minutes
+    
+    return currentUTCMinutes < generationWindowEnd;
+  };
+
+  const getLocalGenerationTime = () => {
+    // Create a date object for 10:00 AM UTC today
+    const generationTime = new Date();
+    generationTime.setUTCHours(10, 0, 0, 0);
+    
+    // Format as local time
+    return generationTime.toLocaleTimeString([], { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const renderErrorMessage = () => {
+    const isWaiting = isWaitingForTodaysEdition();
+    const localTime = isWaiting ? getLocalGenerationTime() : '';
+    
+    return (
+      <Box p={4}>
+        <Alert status={isWaiting ? "info" : "error"} borderRadius="md" mb={4}>
+          <AlertIcon />
+          {isWaiting ? (
+            <Box>
+              No edition published for this region for today's date. A new edition is published daily at 10:00 AM UTC ({localTime} your time). Check back later or select a previous date to view past editions!
+            </Box>
+          ) : (
+            <Box>No published edition for this region/date.</Box>
+          )}
+        </Alert>
+      </Box>
+    );
+  };
 
   return (
     <Box bg="surface.base" color="text.primary" minH="100vh">
