@@ -266,6 +266,7 @@ export function EditionPage() {
                     fontSize={{ base: "2xl", md: "3xl" }}
                     fontWeight="bold"
                     lineHeight="tight"
+                    textAlign="center"
                   >
                     {edition.main_story.headline}
                   </Heading>
