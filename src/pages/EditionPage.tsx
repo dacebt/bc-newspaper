@@ -6,7 +6,7 @@ import { PaperWrapper, PaperTextureLayer, PaperContent } from '../components/Pap
 import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
 
-const MIN_DATE = '2026-01-14'; // Deployment date - no editions before this
+const MIN_DATE = '2026-01-15'; // Deployment date - no editions before this
 const DEFAULT_DATE = (() => {
   // Get today's date in local timezone (not UTC)
   const now = new Date();
