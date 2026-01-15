@@ -7,15 +7,15 @@ import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
 
 const MIN_DATE = '2026-01-15'; // Deployment date - no editions before this
-const DEFAULT_DATE = (() => {
+const TODAY = (() => {
   // Get today's date in local timezone (not UTC)
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  const today = `${year}-${month}-${day}`; // YYYY-MM-DD format
-  return today < MIN_DATE ? MIN_DATE : today;
+  return `${year}-${month}-${day}`; // YYYY-MM-DD format
 })();
+const DEFAULT_DATE = TODAY < MIN_DATE ? MIN_DATE : TODAY;
 
 // Helper to validate region ID
 function isValidRegionId(id: string): boolean {
@@ -240,6 +240,7 @@ export function EditionPage() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               min={MIN_DATE}
+              max={TODAY}
               bg="surface.base"
               borderColor="border.default"
               color="text.primary"
