@@ -111,6 +111,18 @@ export function EditionPage() {
     fetchEdition();
   }, [regionId, date]);
 
+  // Update document title based on edition state
+  useEffect(() => {
+    if (loading) {
+      document.title = 'Loading... - BC Codex News';
+    } else if (edition) {
+      const regionLabel = REGIONS.find(r => r.id === regionId)?.label ?? regionId;
+      document.title = `${regionLabel} - ${edition.main_story.headline} - BC Codex News`;
+    } else {
+      document.title = 'BC Codex News - BitCraft Daily Newspaper';
+    }
+  }, [loading, edition, regionId]);
+
   if (loading) {
     return (
       <Flex justify="center" align="center" minH="100vh" bg="surface.base">
