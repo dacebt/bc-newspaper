@@ -365,7 +365,7 @@ export function EditionPage() {
                       },
                     }}
                   >
-                    <InlineMarkdown text={edition.main_story.body} />
+                    <MarkdownText text={edition.main_story.body} />
                   </Box>
                 </Flex>
               </Box>
@@ -396,14 +396,14 @@ export function EditionPage() {
                             fontWeight="bold"
                             mb={2}
                           >
-                            <InlineMarkdown text={announcement.title} />
+                            <MarkdownText text={announcement.title} />
                           </Heading>
                           <Text
                             fontSize="sm"
                             color="paper.ink"
                             lineHeight="1.5"
                           >
-                            <InlineMarkdown text={announcement.summary} />
+                            <MarkdownText text={announcement.summary} />
                           </Text>
                         </Box>
                         {index < edition.announcements.length - 1 && (
