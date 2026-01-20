@@ -208,7 +208,7 @@ export function EditionPage() {
           _hover={{ color: "text.primary", textDecoration: "none" }}
           transition="color 0.2s"
         >
-          BC Codex News
+          BitCraft Codex News
         </ChakraLink>
 
         {/* Controls - Inline */}
