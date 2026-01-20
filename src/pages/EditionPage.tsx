@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, Link as ChakraLink, Divider } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
-import { InlineMarkdown } from '../components/InlineMarkdown';
+import { MarkdownText } from '../components/MarkdownText';
 import { PaperWrapper, PaperTextureLayer, PaperContent } from '../components/PaperSurface';
 import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
