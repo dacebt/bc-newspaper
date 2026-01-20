@@ -114,12 +114,12 @@ export function EditionPage() {
   // Update document title based on edition state
   useEffect(() => {
     if (loading) {
-      document.title = 'Loading... - BC Codex News';
+      document.title = 'Loading... - BitCraft News';
     } else if (edition) {
       const regionLabel = REGIONS.find(r => r.id === regionId)?.label ?? regionId;
-      document.title = `${regionLabel} - ${edition.main_story.headline} - BC Codex News`;
+      document.title = `${regionLabel} - ${edition.main_story.headline} - BitCraft News`;
     } else {
-      document.title = 'BC Codex News - BitCraft Daily Newspaper';
+      document.title = 'BitCraft News - Daily Regional Newspaper';
     }
   }, [loading, edition, regionId]);
 
