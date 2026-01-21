@@ -347,13 +347,15 @@ export function EditionPage() {
                     fontSize="md"
                     lineHeight="1.6"
                     sx={{
-                      // CSS columns for desktop
-                      '@media (min-width: 768px)': {
-                        columnCount: 2,
-                        columnGap: '2rem',
-                        columnRule: '1px solid',
-                        columnRuleColor: 'paper.rule',
-                      },
+                      // CSS columns for desktop only if body is long enough
+                      ...(edition.main_story.body.length >= 1200 && {
+                        '@media (min-width: 768px)': {
+                          columnCount: 2,
+                          columnGap: '2rem',
+                          columnRule: '1px solid',
+                          columnRuleColor: 'paper.rule',
+                        },
+                      }),
                       // Drop cap on first letter
                       '& > div::first-letter': {
                         float: 'left',
