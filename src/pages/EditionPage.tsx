@@ -200,17 +200,26 @@ export function EditionPage() {
         wrap="wrap"
         gap={4}
       >
-        {/* Logo */}
-        <ChakraLink
-          href="/"
-          fontSize="lg"
-          fontWeight="medium"
-          color="text.secondary"
-          _hover={{ color: "text.primary", textDecoration: "none" }}
-          transition="color 0.2s"
-        >
-          BitCraft Codex News
-        </ChakraLink>
+        {/* Logo and Backlink */}
+        <Flex align="center" gap={4}>
+          <Text
+            fontSize="lg"
+            fontWeight="medium"
+            color="text.secondary"
+          >
+            BitCraft Codex News
+          </Text>
+          <ChakraLink
+            href="https://bccodex.com"
+            fontSize="sm"
+            fontWeight="medium"
+            color="text.tertiary"
+            _hover={{ color: "text.secondary", textDecoration: "none" }}
+            transition="color 0.2s"
+          >
+            bccodex.com
+          </ChakraLink>
+        </Flex>
 
         {/* Controls - Centered Date with Previous/Next */}
         <Flex align="center" gap={3} wrap={{ base: "wrap", sm: "nowrap" }} minW="0">
