@@ -260,6 +260,7 @@ export function EditionPage() {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 min={MIN_DATE}
+                max={TODAY}
                 bg="surface.base"
                 borderColor="border.default"
                 color="text.primary"
