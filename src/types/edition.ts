@@ -5,6 +5,7 @@ export interface Announcement {
 
 export interface MainStory {
   headline: string;
+  lede?: string;
   angle?: string;
   body: string;
 }

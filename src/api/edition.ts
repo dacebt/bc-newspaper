@@ -4,7 +4,9 @@ export async function getEdition(regionId: string, date: string): Promise<Editio
   const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
   const url = `${baseUrl}/api/edition?region_id=${encodeURIComponent(regionId)}&date=${encodeURIComponent(date)}`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    cache: 'no-store',
+  });
 
   if (!response.ok) {
     if (response.status === 404) {

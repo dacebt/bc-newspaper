@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, Link as ChakraLink, Divider } from '@chakra-ui/react';
+import { Box, Flex, Grid, Heading, Text, Spinner, Alert, AlertIcon, Select, Input, Link as ChakraLink, Divider, Button } from '@chakra-ui/react';
 import { getEdition } from '../api/edition';
 import { MarkdownText } from '../components/MarkdownText';
+import { MainStoryBody } from '../components/MainStoryBody';
 import { PaperWrapper, PaperTextureLayer, PaperContent } from '../components/PaperSurface';
 import { REGIONS } from '../config/regions';
 import type { EditionOutput } from '../types/edition';
@@ -211,7 +212,7 @@ export function EditionPage() {
           BitCraft Codex News
         </ChakraLink>
 
-        {/* Controls - Inline */}
+        {/* Controls - Centered Date with Previous/Next */}
         <Flex align="center" gap={3} wrap={{ base: "wrap", sm: "nowrap" }} minW="0">
           <Flex align="center" gap={2}>
             <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap" id="region-label">Region:</Text>
@@ -232,22 +233,55 @@ export function EditionPage() {
               ))}
             </Select>
           </Flex>
+          
+          {/* Date Control - Centered with Previous/Next */}
           <Flex align="center" gap={2}>
-            <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap" id="date-label">Date:</Text>
-            <Input
+            <Button
               size="sm"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              min={MIN_DATE}
-              max={TODAY}
-              bg="surface.base"
-              borderColor="border.default"
-              color="text.primary"
-              maxW="140px"
-              aria-labelledby="date-label"
-            />
+              variant="ghost"
+              onClick={() => {
+                const prevDate = new Date(date);
+                prevDate.setDate(prevDate.getDate() - 1);
+                const prevDateStr = prevDate.toISOString().split('T')[0];
+                if (prevDateStr >= MIN_DATE) {
+                  setDate(prevDateStr);
+                }
+              }}
+              isDisabled={date <= MIN_DATE}
+              aria-label="Previous day"
+            >
+              ←
+            </Button>
+            <Flex align="center" gap={2}>
+              <Text color="text.secondary" fontSize="xs" whiteSpace="nowrap" id="date-label">Date:</Text>
+              <Input
+                size="sm"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                min={MIN_DATE}
+                bg="surface.base"
+                borderColor="border.default"
+                color="text.primary"
+                maxW="140px"
+                aria-labelledby="date-label"
+              />
+            </Flex>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                const nextDate = new Date(date);
+                nextDate.setDate(nextDate.getDate() + 1);
+                const nextDateStr = nextDate.toISOString().split('T')[0];
+                setDate(nextDateStr);
+              }}
+              aria-label="Next day"
+            >
+              →
+            </Button>
           </Flex>
+          
           {loading && <Spinner size="sm" color="text.primary" />}
         </Flex>
       </Flex>
@@ -331,6 +365,22 @@ export function EditionPage() {
                   >
                     {edition.main_story.headline}
                   </Heading>
+                  
+                  {/* Lede - Opening paragraph */}
+                  {edition.main_story.lede && (
+                    <Text
+                      color="paper.ink"
+                      fontSize="lg"
+                      fontStyle="italic"
+                      fontWeight="medium"
+                      lineHeight="relaxed"
+                      textAlign="center"
+                      px={4}
+                    >
+                      {edition.main_story.lede}
+                    </Text>
+                  )}
+                  
                   {edition.main_story.angle && (
                     <Text
                       color="paper.muted"
@@ -343,31 +393,41 @@ export function EditionPage() {
                       {edition.main_story.angle}
                     </Text>
                   )}
+                  
                   <Box
                     fontSize="md"
-                    lineHeight="1.6"
+                    lineHeight="1.75"
                     sx={{
                       // CSS columns for desktop only if body is long enough
                       ...(edition.main_story.body.length >= 1200 && {
                         '@media (min-width: 768px)': {
                           columnCount: 2,
-                          columnGap: '2rem',
-                          columnRule: '1px solid',
-                          columnRuleColor: 'paper.rule',
+                          columnGap: '2.5rem',
+                          columnRule: '0.5px solid',
+                          columnRuleColor: 'rgba(212, 212, 212, 0.6)',
                         },
                       }),
-                      // Drop cap on first letter
-                      '& > div::first-letter': {
+                      // Drop cap on first letter - improved baseline rhythm
+                      '& > div > p:first-of-type::first-letter': {
                         float: 'left',
-                        fontSize: '3.5em',
-                        lineHeight: '0.9',
+                        fontSize: '4em',
+                        lineHeight: '0.85',
                         fontWeight: 'bold',
-                        marginRight: '0.1em',
+                        marginRight: '0.08em',
                         marginTop: '0.05em',
+                        fontFamily: `"Times New Roman", Times, serif`,
+                      },
+                      // Paragraph spacing
+                      '& > div > p': {
+                        marginBottom: '1em',
+                        textAlign: 'left', // Ragged-right for web readability
+                      },
+                      '& > div > p:last-child': {
+                        marginBottom: 0,
                       },
                     }}
                   >
-                    <MarkdownText text={edition.main_story.body} />
+                    <MainStoryBody text={edition.main_story.body} />
                   </Box>
                 </Flex>
               </Box>
