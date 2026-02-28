@@ -1,6 +1,8 @@
 export type RegionOption = { id: string; label: string };
 
-export const REGIONS: RegionOption[] = Array.from({ length: 9 }, (_, i) => ({
-  id: String(i + 1),
-  label: `Region ${i + 1}`,
+const ACTIVE_REGION_IDS = ["7", "8", "9", "12", "13", "14", "17", "18", "19"] as const;
+
+export const REGIONS: RegionOption[] = ACTIVE_REGION_IDS.map((id) => ({
+  id,
+  label: `Region ${id}`,
 }));
